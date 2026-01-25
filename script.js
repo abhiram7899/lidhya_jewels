@@ -1,147 +1,150 @@
-/* =========================================
-   LIDHYA - SUPABASE CONNECTION (FINAL)
-   ========================================= */
-
-// 1. SUPABASE CONFIGURATION
-// I found this URL from the image link you shared:
+// --- 1. CONFIGURATION ---
 const SUPABASE_URL = 'https://unuswepvspaxyepakkkn.supabase.co';
 
-// 🛑 STOP! PASTE YOUR KEY BELOW 🛑
-// Go to Supabase > Settings > API > Project API Keys > anon / public
+// ⚠️ Ensure this key matches your admin.html key
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVudXN3ZXB2c3BheHllcGFra2tuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2NjUyNjAsImV4cCI6MjA4NDI0MTI2MH0.D-sL54xnijvTu6CvDu29n20zbW1rZJNdAo6MXlsMm4w'; 
 
-// Initialize the client
+// Your Instagram Username (No @ symbol)
+const instagramUsername = "lidhya_thejewelhouse"; // <--- CHANGE THIS TO YOUR ACTUAL USERNAME
+
+// Initialize Supabase
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Global State
-let products = [];
-const instagramUsername = "lidhya_thejewelhouse"; 
+// Variables
+let allProducts = [];
+let currentProduct = null;
 
-// 2. MOBILE MENU
-function toggleMenu() {
-    const navLinks = document.getElementById('navLinks');
-    navLinks.classList.toggle('active');
-}
-
-// 3. FETCH DATA FROM SUPABASE
+// --- 2. FETCH PRODUCTS ---
 async function fetchProducts() {
-    const productContainer = document.getElementById('product-container');
-    
-    // Show loading state
-    if(productContainer) {
-        productContainer.innerHTML = '<p style="color:white; text-align:center; grid-column:1/-1;">Loading Collection...</p>';
-    }
+    const container = document.getElementById('product-container');
+    container.innerHTML = '<p class="loading-text">Loading Collection...</p>';
 
-    try {
-        // Fetch data from 'products' table
-        let { data, error } = await db
-            .from('products')
-            .select('*');
+    // Fetch from Supabase (Newest first)
+    let { data, error } = await db
+        .from('products')
+        .select('*')
+        .order('id', { ascending: false });
 
-        if (error) throw error;
-
-        products = data;
-        
-        if(productContainer) {
-            displayProducts(products);
-        }
-    } catch (error) {
-        console.error("Error loading products:", error);
-        if(productContainer) {
-            productContainer.innerHTML = '<p style="color:red; text-align:center; grid-column:1/-1;">Failed to load products.</p>';
-        }
-    }
-}
-
-// 4. DISPLAY PRODUCTS
-function displayProducts(items) {
-    const productContainer = document.getElementById('product-container');
-    if (!productContainer) return;
-
-    if (items.length === 0) {
-        productContainer.innerHTML = `<p style="text-align:center; width:100%; grid-column: 1/-1;">No products found.</p>`;
+    if (error) {
+        console.error("Error:", error);
+        container.innerHTML = '<p>Error loading products. Please try again.</p>';
         return;
     }
 
-    productContainer.innerHTML = items.map(product => {
-        // Handle Sold Out Logic
-        const isSoldOut = product.sold_out === true;
-        const buttonAction = isSoldOut ? '' : `onclick="openModal(${product.id})"`;
-        const imageClass = isSoldOut ? 'style="opacity: 0.5;"' : '';
-        const badge = isSoldOut ? '<div style="position:absolute; top:10px; right:10px; background:red; color:white; padding:5px 10px; font-size:0.8rem; border-radius:4px;">SOLD OUT</div>' : '';
+    allProducts = data;
+    renderProducts(allProducts);
+}
 
-        // FIX: Ensure you are using backticks (`) below, not single quotes (')
+// --- 3. RENDER PRODUCTS ---
+function renderProducts(products) {
+    const container = document.getElementById('product-container');
+    
+    if (products.length === 0) {
+        container.innerHTML = '<p>No products found in this category.</p>';
+        return;
+    }
+
+    container.innerHTML = products.map(product => {
+        // Logic for Sold Out Badge
+        const isSoldOut = product.sold_out === true;
+        const soldBadge = isSoldOut ? '<span class="sold-out-badge">SOLD OUT</span>' : '';
+        const cardClass = isSoldOut ? 'product-card sold-out' : 'product-card';
+        // Disable click if sold out
+        const clickAction = isSoldOut ? '' : `onclick="openModal(${product.id})"`;
+
         return `
-        <div class="product-card" ${buttonAction} style="position:relative;">
-            ${badge}
-            <img src="${product.image}" alt="${product.name}" ${imageClass} loading="lazy">
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <span>${product.price}</span>
+            <div class="${cardClass}" ${clickAction}>
+                <div class="img-container">
+                    ${soldBadge}
+                    <img src="${product.image}" alt="${product.name}" loading="lazy">
+                </div>
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <p class="price">${product.price}</p>
+                </div>
             </div>
-        </div>
         `;
     }).join('');
 }
-// 5. FILTER FUNCTION
-window.filterProducts = function(category, btn) {
-    let allButtons = document.querySelectorAll('.cat-btn');
-    allButtons.forEach(b => b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
 
-    const catLower = category.toLowerCase();
-    if (catLower === 'all') {
-        displayProducts(products);
+// --- 4. FILTER CATEGORIES ---
+window.filterProducts = function(category, btnElement) {
+    // 1. Remove 'active' class from all buttons
+    const buttons = document.querySelectorAll('.cat-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+
+    // 2. Add 'active' class to the clicked button
+    if (btnElement) {
+        btnElement.classList.add('active');
+    }
+
+    // 3. Filter Data
+    if (category === 'all') {
+        renderProducts(allProducts);
     } else {
-        const filtered = products.filter(p => p.category.toLowerCase() === catLower);
-        displayProducts(filtered);
+        const filtered = allProducts.filter(p => p.category === category);
+        renderProducts(filtered);
     }
 };
 
-// 6. MODAL & INSTAGRAM LOGIC
+// --- 5. MODAL (POPUP) LOGIC ---
 const modal = document.getElementById('product-modal');
-let currentProduct = null;
 
 window.openModal = function(id) {
-    const product = products.find(p => p.id === id);
-    if(!product) return;
+    // Find product details
+    currentProduct = allProducts.find(p => p.id === id);
+    
+    if (!currentProduct) return;
 
-    currentProduct = product;
+    // Fill Modal Data
+    document.getElementById('modal-img').src = currentProduct.image;
+    document.getElementById('modal-title').innerText = currentProduct.name;
+    document.getElementById('modal-category').innerText = currentProduct.category.toUpperCase();
+    document.getElementById('modal-price').innerText = currentProduct.price;
+    document.getElementById('modal-desc').innerText = currentProduct.description || "No description available.";
 
-    document.getElementById('modal-img').src = product.image;
-    document.getElementById('modal-title').innerText = product.name;
-    
-    // ✅ THIS IS THE FIX YOU ASKED FOR
-    // We use .description instead of .desc
-    document.getElementById('modal-desc').innerText = product.description;
-    
-    document.getElementById('modal-price').innerText = product.price;
-    document.getElementById('modal-category').innerText = product.category.toUpperCase();
-    
-    modal.style.display = "flex";
-    document.body.style.overflow = "hidden";
+    // Show Modal
+    modal.style.display = 'flex';
 };
 
 window.closeModal = function() {
-    modal.style.display = "none";
-    document.body.style.overflow = "auto";
+    modal.style.display = 'none';
 };
 
+// Close modal if clicking outside the box
 window.onclick = function(event) {
-    if (event.target == modal) closeModal();
+    if (event.target === modal) {
+        closeModal();
+    }
 };
 
+// --- 6. SMART INSTAGRAM BUY BUTTON ---
 window.buyOnInstagram = function() {
     if (!currentProduct) return;
+    
+    // 1. Create the message
     const message = `Hi Lidhya! I want to buy: ${currentProduct.name} (${currentProduct.price})`;
-    const url = `https://ig.me/m/${instagramUsername}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+
+    // 2. Copy to Clipboard
+    navigator.clipboard.writeText(message).then(() => {
+        
+        // 3. Notify User
+        const proceed = confirm("✅ Message copied to clipboard!\n\nClick OK to open Instagram, then PASTE the message in the chat.");
+        
+        if (proceed) {
+            // 4. Open Instagram Direct Message
+            // Uses 'ig.me' shortlink which handles app opening better
+            window.location.href = `https://ig.me/m/${instagramUsername}`; 
+        }
+
+    }).catch(err => {
+        // Fallback if clipboard fails (rare)
+        console.error("Clipboard failed", err);
+        // Try the old way as a backup
+        window.location.href = `https://ig.me/m/${instagramUsername}?text=${encodeURIComponent(message)}`;
+    });
 };
 
-// INITIALIZE
-document.addEventListener('DOMContentLoaded', () => {
-    if(document.getElementById('product-container')) {
-        fetchProducts();
-    }
-});
+// Load products on start
+fetchProducts();
