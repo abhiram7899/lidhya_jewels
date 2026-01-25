@@ -150,3 +150,8 @@ window.buyOnInstagram = function() {
 
 // Load products on start
 fetchProducts();
+// --- 7. MOBILE MENU TOGGLE ---
+function toggleMenu() {
+    const navLinks = document.getElementById('navLinks');
+    navLinks.classList.toggle('active');
+};
