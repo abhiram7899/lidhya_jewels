@@ -16,7 +16,7 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Global State
 let products = [];
-const instagramUsername = "lidhyajewels"; 
+const instagramUsername = "lidhya_thejewelhouse"; 
 
 // 2. MOBILE MENU
 function toggleMenu() {
