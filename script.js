@@ -46,12 +46,12 @@ function renderProducts(products) {
     }
 
     container.innerHTML = products.map(product => {
-        
-        // Handle Sold Out Logic
+        // Logic for Sold Out Badge
         const isSoldOut = product.sold_out === true;
-        const buttonAction = isSoldOut ? '' : `onclick="openModal(${product.id})"`;
-        const imageClass = isSoldOut ? 'style="opacity: 0.5;"' : '';
-        const badge = isSoldOut ? '<div style="position:absolute; top:10px; right:10px; background:red; color:white; padding:5px 10px; font-size:0.8rem; border-radius:4px;">SOLD OUT</div>' : '';
+        const soldBadge = isSoldOut ? '<span class="sold-out-badge">SOLD OUT</span>' : '';
+        const cardClass = isSoldOut ? 'product-card sold-out' : 'product-card';
+        // Disable click if sold out
+        const clickAction = isSoldOut ? '' : `onclick="openModal(${product.id})"`;
 
         return `
             <div class="${cardClass}" ${clickAction}>
