@@ -48,13 +48,16 @@ function renderProducts(products) {
     container.innerHTML = products.map(product => {
         // Logic for Sold Out Badge
         const isSoldOut = product.sold_out === true;
-        const soldBadge = isSoldOut ? '<span class="sold-out-badge">SOLD OUT</span>' : '';
+        
+        // YOUR CUSTOM BADGE STYLE
+        const soldBadge = isSoldOut ? '<div style="position:absolute; top:10px; right:10px; background:red; color:white; padding:5px 10px; font-size:0.8rem; border-radius:4px; z-index:10;">SOLD OUT</div>' : '';
+        
         const cardClass = isSoldOut ? 'product-card sold-out' : 'product-card';
         // Disable click if sold out
         const clickAction = isSoldOut ? '' : `onclick="openModal(${product.id})"`;
 
         return `
-            <div class="${cardClass}" ${clickAction}>
+            <div class="${cardClass}" ${clickAction} style="position:relative;">
                 <div class="img-container">
                     ${soldBadge}
                     <img src="${product.image}" alt="${product.name}" loading="lazy">
@@ -67,7 +70,6 @@ function renderProducts(products) {
         `;
     }).join('');
 }
-
 // --- 4. FILTER CATEGORIES ---
 window.filterProducts = function(category, btnElement) {
     // 1. Remove 'active' class from all buttons
