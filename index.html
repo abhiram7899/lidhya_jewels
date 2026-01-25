@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lidhya | The Jewel House</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpeg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <nav id="homeNav" class="transparent-nav">
+        <div class="logo-container">
+            <img src="logo.jpeg" alt="Lidhya Logo" class="nav-logo">
+        </div>
+        <div class="hamburger" onclick="toggleMenu()">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html" class="active-link">Home</a></li>
+            <li><a href="products.html">Collection</a></li>
+            <li><a href="about.html">About</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero-slider">
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1573408301185-9146fe634ad0?q=80&w=2075');"></div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?q=80&w=2070');"></div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1617038260897-fc772472522a?q=80&w=2070');"></div>
+        
+        <div class="hero-overlay"></div>
+        
+        <div class="hero-content luxury-text">
+            <h1 class="gold-metallic">LIDHYA</h1>
+            <div class="divider-gold"></div>
+            <p class="tagline">The Jewel House</p>
+            <p class="sub-text">Adornments for the modern muse.</p>
+            <a href="products.html" class="btn-gold animated-btn">Explore Collection</a>
+        </div>
+
+    </header>
+
+
+    <footer>
+        <p>&copy; 2026 Lidhya - The Jewel House</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Specific script just for home page scroll effect
+        window.addEventListener('scroll', function() {
+            const nav = document.getElementById('homeNav');
+            if (window.scrollY > 50) {
+                nav.classList.remove('transparent-nav');
+                nav.classList.add('scrolled-nav');
+            } else {
+                nav.classList.add('transparent-nav');
+                nav.classList.remove('scrolled-nav');
+            }
+        });
+    </script>
+</body>
+</html>

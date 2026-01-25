@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Lidhya</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpeg">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Admin Styles */
+        .admin-container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            background: var(--dark-panel);
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+        }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; color: var(--gold); margin-bottom: 5px; font-weight: bold; }
+        input, textarea, select {
+            width: 100%; padding: 10px; background: #000;
+            border: 1px solid #333; color: #fff; border-radius: 4px; outline: none;
+        }
+        .status-msg { text-align: center; margin-top: 10px; font-weight: bold; }
+        .hidden { display: none; }
+
+        /* NEW: Product List Styles */
+        .inventory-list { margin-top: 40px; }
+        .inventory-item {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #000; padding: 10px; border-bottom: 1px solid #333; gap: 10px;
+        }
+        .inventory-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+        .item-details { flex-grow: 1; }
+        .item-name { color: #fff; font-size: 0.9rem; display: block; }
+        .item-price { color: var(--gold); font-size: 0.8rem; }
+        
+        .btn-toggle {
+            padding: 5px 10px; font-size: 0.7rem; cursor: pointer; border: none; border-radius: 4px;
+        }
+        .btn-sold { background: #d32f2f; color: white; } /* Red for Sold Out */
+        .btn-active { background: #388e3c; color: white; } /* Green for Available */
+        .btn-delete { background: transparent; color: #666; font-size: 1.2rem; cursor: pointer; border:none; margin-left: 5px;}
+    </style>
+</head>
+<body>
+
+    <nav class="scrolled-nav">
+        <div class="logo-container">
+            <img src="logo.jpeg" alt="Lidhya Logo" class="nav-logo">
+        </div>
+        <div style="color:white; font-weight:bold;">ADMIN PANEL</div>
+    </nav>
+
+    <div id="login-section" class="admin-container" style="text-align:center;">
+        <h2 style="color:var(--gold); margin-bottom:20px;">Enter Admin PIN</h2>
+        <input type="password" id="admin-pin" placeholder="PIN" style="text-align:center; font-size:1.2rem;">
+        <button class="btn-gold" onclick="checkPin()" style="margin-top:20px; width:100%;">Login</button>
+    </div>
+
+    <div id="admin-panel" class="admin-container hidden">
+        
+        <h2 style="text-align:center; color:var(--white); border-bottom:1px solid #333; padding-bottom:10px;">Add New Product</h2>
+        <div class="form-group" style="margin-top:20px;">
+            <label>Name</label><input type="text" id="p-name">
+        </div>
+        <div class="form-group">
+            <label>Category</label>
+            <select id="p-category">
+                <option value="necklace">Necklace</option>
+                <option value="earrings">Earrings</option>
+                <option value="bands">Bands</option>
+                <option value="sets">Bridal Sets</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Price</label><input type="text" id="p-price" placeholder="₹">
+        </div>
+        <div class="form-group">
+            <label>Description</label><textarea id="p-desc" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Image</label><input type="file" id="p-image" accept="image/*">
+        </div>
+        <button class="btn-gold" id="upload-btn" onclick="uploadAndAdd()" style="width:100%;">Upload Product</button>
+        <p id="status" class="status-msg"></p>
+
+        <div class="inventory-list">
+            <h2 style="text-align:center; color:var(--white); border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:15px;">Manage Stock</h2>
+            <div id="product-list">
+                <p style="text-align:center; color:#666;">Loading products...</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. CONFIGURATION
+        const SUPABASE_URL = 'https://unuswepvspaxyepakkkn.supabase.co';
+        
+        // ⚠️ PASTE YOUR KEY HERE AGAIN (The one from script.js)
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVudXN3ZXB2c3BheHllcGFra2tuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2NjUyNjAsImV4cCI6MjA4NDI0MTI2MH0.D-sL54xnijvTu6CvDu29n20zbW1rZJNdAo6MXlsMm4w'; 
+
+        const MY_PIN = "1234"; // Your PIN
+
+        const { createClient } = supabase;
+        const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // --- LOGIN ---
+        function checkPin() {
+            if(document.getElementById('admin-pin').value === MY_PIN) {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                fetchProductsForAdmin(); // Load the list immediately after login
+            } else {
+                alert("Wrong PIN");
+            }
+        }
+
+        // --- FETCH PRODUCTS FOR LIST ---
+        async function fetchProductsForAdmin() {
+            const listContainer = document.getElementById('product-list');
+            
+            let { data: products, error } = await db
+                .from('products')
+                .select('*')
+                .order('id', { ascending: false }); // Newest first
+
+            if(error) {
+                listContainer.innerHTML = '<p style="color:red; text-align:center">Error loading list</p>';
+                return;
+            }
+
+            if(products.length === 0) {
+                listContainer.innerHTML = '<p style="color:#666; text-align:center">No products found.</p>';
+                return;
+            }
+
+            // Render HTML
+            listContainer.innerHTML = products.map(p => {
+                const isSold = p.sold_out === true;
+                const btnText = isSold ? "Mark Available" : "Mark Sold Out";
+                const btnClass = isSold ? "btn-active" : "btn-sold";
+                const statusColor = isSold ? "color:red;" : "color:green;";
+                const statusText = isSold ? "(SOLD OUT)" : "";
+
+                return `
+                <div class="inventory-item">
+                    <img src="${p.image}" alt="img">
+                    <div class="item-details">
+                        <span class="item-name">${p.name} <span style="${statusColor} font-size:0.7rem">${statusText}</span></span>
+                        <span class="item-price">${p.price}</span>
+                    </div>
+                    
+                    <button class="btn-toggle ${btnClass}" onclick="toggleSoldOut(${p.id}, ${isSold})">
+                        ${btnText}
+                    </button>
+                    
+                    <button class="btn-delete" onclick="deleteProduct(${p.id})">&times;</button>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // --- TOGGLE SOLD OUT LOGIC ---
+        async function toggleSoldOut(id, currentStatus) {
+            // Flip the status (if true -> false, if false -> true)
+            const newStatus = !currentStatus;
+
+            const { error } = await db
+                .from('products')
+                .update({ sold_out: newStatus })
+                .eq('id', id);
+
+            if(error) {
+                alert("Error updating status: " + error.message);
+            } else {
+                // Refresh the list to show changes
+                fetchProductsForAdmin();
+            }
+        }
+
+        // --- DELETE LOGIC (Bonus) ---
+        async function deleteProduct(id) {
+            if(!confirm("Are you sure you want to delete this product?")) return;
+
+            const { error } = await db
+                .from('products')
+                .delete()
+                .eq('id', id);
+
+            if(error) alert("Error deleting: " + error.message);
+            else fetchProductsForAdmin();
+        }
+
+        // --- UPLOAD LOGIC (Existing) ---
+        async function uploadAndAdd() {
+            const btn = document.getElementById('upload-btn');
+            const status = document.getElementById('status');
+            const fileInput = document.getElementById('p-image');
+            const file = fileInput.files[0];
+
+            if (!file || !document.getElementById('p-name').value) return alert("Fill details!");
+
+            btn.innerText = "Wait..."; btn.disabled = true; status.innerText = "";
+
+            try {
+                const fileName = Date.now() + "_" + file.name.replace(/\s/g, '_');
+                const { error: uploadError } = await db.storage.from('product-images').upload(fileName, file);
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = db.storage.from('product-images').getPublicUrl(fileName);
+
+                const { error: insertError } = await db.from('products').insert([{
+                    name: document.getElementById('p-name').value,
+                    category: document.getElementById('p-category').value,
+                    price: document.getElementById('p-price').value,
+                    description: document.getElementById('p-desc').value,
+                    image: publicUrl,
+                    sold_out: false
+                }]);
+
+                if (insertError) throw insertError;
+
+                status.innerText = "✅ Added!"; status.style.color = "#4CAF50";
+                
+                // Clear Form & Refresh List
+                document.getElementById('p-name').value = "";
+                document.getElementById('p-price').value = "";
+                document.getElementById('p-desc').value = "";
+                fileInput.value = "";
+                fetchProductsForAdmin(); // Update the list below instantly
+
+            } catch (err) {
+                console.error(err); status.innerText = "Error!"; status.style.color = "red";
+            } finally {
+                btn.innerText = "Upload Product"; btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

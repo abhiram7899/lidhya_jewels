@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Collection | Lidhya</title>
+    
+    <link rel="icon" type="image/jpeg" href="logo.jpeg">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <nav class="scrolled-nav">
+        <div class="logo-container">
+            <a href="index.html"><img src="logo.jpeg" alt="Lidhya Logo" class="nav-logo"></a>
+        </div>
+        <div class="hamburger" onclick="toggleMenu()">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html" class="active-link">Collection</a></li>
+            <li><a href="about.html">About</a></li>
+        </ul>
+    </nav>
+
+    <div class="page-header">
+        <h2>Collection</h2>
+    </div>
+
+    <section class="shop-section">
+        
+        <div class="category-scroll-container">
+            <div class="categories">
+                <button class="cat-btn active" onclick="filterProducts('all', this)">All</button>
+                <button class="cat-btn" onclick="filterProducts('necklace', this)">Necklaces</button>
+                <button class="cat-btn" onclick="filterProducts('earrings', this)">Earrings</button>
+                <button class="cat-btn" onclick="filterProducts('bands', this)">Bands</button>
+                <button class="cat-btn" onclick="filterProducts('sets', this)">Bridal Sets</button>
+            </div>
+        </div>
+
+        <div class="product-grid" id="product-container">
+            </div>
+    </section>
+
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            
+            <div class="modal-img-container">
+                <img id="modal-img" src="" alt="Jewelry">
+            </div>
+            
+            <div class="modal-info">
+                <h2 id="modal-title">Product Name</h2>
+                <div class="flex-row">
+                    <p id="modal-category" class="gold-text">CATEGORY</p>
+                    <span id="modal-price">₹0.00</span>
+                </div>
+                
+                <p id="modal-desc">Description goes here...</p>
+                
+                <button class="btn-gold instagram-btn full-width" onclick="buyOnInstagram()">
+                    Buy on Instagram
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Lidhya - The Jewel House</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

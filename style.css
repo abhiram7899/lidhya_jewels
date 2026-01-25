@@ -1,0 +1,607 @@
+/* =========================================
+   1. GLOBAL VARIABLES & RESET
+   ========================================= */
+:root {
+    --gold: #D4AF37;           /* The main Brand Gold */
+    /* Metallic Gold Gradient for Text */
+    --gold-gradient: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+    
+    --black: #080808;          /* Deep Black Background */
+    --dark-panel: #141414;     /* Slightly lighter for cards */
+    --white: #ffffff;
+    --gray: #888888;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Lato', sans-serif;
+    -webkit-tap-highlight-color: transparent; /* Removes blue highlight on mobile tap */
+}
+
+body {
+    background-color: var(--black);
+    color: var(--white);
+    overflow-x: hidden; /* Prevents horizontal scroll issues */
+}
+
+h1, h2, h3, h4, .tagline {
+    font-family: 'Cinzel', serif; /* Luxury Serif Font */
+}
+
+a { text-decoration: none; }
+
+/* =========================================
+   2. NAVIGATION (Mobile First + Desktop)
+   ========================================= */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: 0.4s ease;
+}
+
+/* State: Transparent (Used on Home Page initial load) */
+.transparent-nav {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* State: Solid Black (Used on Scroll OR Product Page) */
+.scrolled-nav {
+    background-color: var(--black); /* Updated to pure black */
+    border-bottom: 1px solid #222;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.nav-logo {
+    height: 40px; /* Adjust based on your logo */
+}
+
+/* Hamburger Icon (Visible on Mobile) */
+.hamburger {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 5px;
+}
+
+.line {
+    width: 25px;
+    height: 2px;
+    background-color: var(--gold);
+    transition: 0.3s;
+}
+
+/* Nav Links (Hidden on Mobile by default) */
+.nav-links {
+    position: absolute;
+    right: 0;
+    top: 70px;
+    background: var(--black);
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--gold);
+    display: none; /* Hidden */
+    list-style: none;
+}
+
+.nav-links.active {
+    display: flex; /* Shown when hamburger clicked */
+    animation: slideDown 0.3s ease;
+}
+
+.nav-links li { margin: 15px 0; }
+
+.nav-links a {
+    color: var(--gray);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    transition: 0.3s;
+}
+
+.nav-links a.active-link, .nav-links a:hover {
+    color: var(--gold);
+}
+
+/* Desktop Nav Overrides */
+@media (min-width: 769px) {
+    .hamburger { display: none; }
+    
+    .nav-links {
+        position: static;
+        display: flex;
+        flex-direction: row;
+        width: auto;
+        background: transparent;
+        border: none;
+        gap: 40px;
+        padding: 0;
+    }
+    
+    nav { padding: 15px 50px; }
+    .nav-logo { height: 50px; }
+}
+
+/* =========================================
+   3. HOME PAGE (HERO SLIDER)
+   ========================================= */
+.hero-slider {
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* Background Slider Animation */
+.slide {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    animation: fadeSlide 18s infinite; /* 3 slides x 6s */
+    opacity: 0;
+    transform: scale(1.1);
+}
+
+/* Stagger Animations */
+.slide:nth-child(1) { animation-delay: 0s; }
+.slide:nth-child(2) { animation-delay: 6s; }
+.slide:nth-child(3) { animation-delay: 12s; }
+
+.hero-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Darkens bg for text */
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 20px;
+}
+
+/* Luxury Metallic Text (Fixed VS Code Warning) */
+.gold-metallic {
+    font-size: 3.5rem;
+    background: var(--gold-gradient);
+    
+    /* Standard & Webkit for compatibility */
+    -webkit-background-clip: text;
+    background-clip: text;
+    
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 5px;
+    margin-bottom: 10px;
+}
+
+.divider-gold {
+    height: 2px;
+    width: 60px;
+    background: var(--gold);
+    margin: 10px auto;
+}
+
+.tagline { font-size: 1.2rem; letter-spacing: 2px; color: var(--white); }
+.sub-text { margin-top: 10px; margin-bottom: 30px; color: #ddd; font-weight: 300; }
+
+/* Main Button */
+.btn-gold {
+    padding: 12px 35px;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    display: inline-block;
+    transition: 0.3s;
+}
+
+.btn-gold:hover, .btn-gold:active {
+    background: var(--gold);
+    color: var(--black);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+}
+
+/* Scroll Down Indicator */
+.scroll-indicator {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--white);
+    text-align: center;
+    opacity: 0.8;
+    z-index: 2;
+}
+.scroll-indicator span { display: block; font-size: 0.7rem; letter-spacing: 2px; margin-bottom: 8px; text-transform: uppercase; }
+.bounce { animation: bounce 2s infinite; }
+
+/* =========================================
+   4. TRENDING SECTION (Horizontal Scroll)
+   ========================================= */
+.trending-preview {
+    padding: 40px 20px;
+    background: linear-gradient(to bottom, var(--black), #111);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.section-header h2 { font-size: 1.5rem; color: var(--gold); }
+.view-all-link { color: var(--gray); font-size: 0.9rem; }
+
+.trending-scroll-container {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto; /* Enables horizontal scroll */
+    padding-bottom: 10px;
+    -webkit-overflow-scrolling: touch; /* Smooth iOS scroll */
+    scrollbar-width: none; /* Firefox hide scrollbar */
+}
+.trending-scroll-container::-webkit-scrollbar { display: none; }
+
+.trend-item {
+    min-width: 150px;
+    text-align: center;
+}
+
+.trend-item img {
+    width: 150px; height: 190px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #333;
+    transition: 0.3s;
+}
+
+.trend-item h4 {
+    margin-top: 10px;
+    color: #eee;
+    font-size: 0.85rem;
+}
+
+/* =========================================
+   5. PRODUCT PAGE
+   ========================================= */
+.page-header {
+    padding: 30px 20px;
+    text-align: center;
+    background-color: var(--black); /* UPDATED: Pure black as requested */
+    border-bottom: 1px solid #222;
+}
+.page-header h2 { font-size: 2rem; color: var(--gold); }
+
+/* Horizontal Category Filter (App-Style) */
+.category-scroll-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 15px 20px;
+    background: var(--black);
+    position: sticky; /* Keeps filters visible while scrolling products */
+    top: 71px; /* Height of nav */
+    z-index: 90;
+    border-bottom: 1px solid #222;
+}
+
+.categories { display: inline-flex; gap: 10px; }
+
+.cat-btn {
+    background: #1a1a1a;
+    color: #888;
+    border: 1px solid #333;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cat-btn.active {
+    background: var(--gold);
+    color: var(--black);
+    border-color: var(--gold);
+    font-weight: bold;
+}
+
+/* Product Grid (2 Columns Mobile) */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Force 2 columns */
+    gap: 15px;
+    padding: 20px 15px 60px 15px;
+}
+
+.product-card {
+    background: var(--dark-panel);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.product-card:active { transform: scale(0.98); } /* Tap effect */
+
+.product-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.product-info { padding: 12px; text-align: center; }
+
+.product-info h3 {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* ... if name too long */
+    color: #eee;
+}
+
+.product-info span { font-size: 0.9rem; color: var(--gold); font-weight: bold; }
+
+/* Desktop Grid Adjustments */
+@media (min-width: 769px) {
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 30px;
+        padding: 40px 8%;
+    }
+    .product-card img { height: 300px; }
+    .product-card:hover { transform: translateY(-10px); }
+    .gold-metallic { font-size: 5rem; letter-spacing: 10px; }
+}
+
+/* =========================================
+   6. MODAL / POPUP (Bottom Sheet on Mobile)
+   ========================================= */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    /* Flex alignment for Mobile: Bottom Sheet */
+    align-items: flex-end; 
+    justify-content: center;
+}
+
+.modal-content {
+    background: var(--black);
+    width: 100%;
+    height: 85vh; /* Takes up 85% of screen height */
+    border-radius: 20px 20px 0 0;
+    border-top: 2px solid var(--gold);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    animation: slideUp 0.3s ease-out;
+}
+
+.modal-img-container {
+    height: 45%;
+    width: 100%;
+    background: #000;
+}
+
+.modal-img-container img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 18px 18px 0 0;
+}
+
+.modal-info {
+    padding: 25px;
+    height: 55%;
+    display: flex;
+    flex-direction: column;
+}
+
+#modal-title { font-size: 1.6rem; margin-bottom: 5px; color: var(--white); }
+.flex-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+#modal-price { font-size: 1.4rem; color: var(--gold); font-weight: bold; }
+#modal-category { font-size: 0.8rem; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; }
+
+#modal-desc {
+    font-size: 0.95rem;
+    color: #ccc;
+    line-height: 1.6;
+    overflow-y: auto; /* Scroll text if too long */
+    flex-grow: 1;
+    margin-bottom: 20px;
+}
+
+/* Buy Button inside Modal */
+.full-width {
+    width: 100%;
+    text-align: center;
+    padding: 18px;
+    background: var(--gold);
+    color: var(--black);
+    border: none;
+    font-weight: 800;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px; right: 20px;
+    font-size: 25px;
+    color: var(--white);
+    background: rgba(0,0,0,0.6);
+    width: 35px; height: 35px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 35px;
+    z-index: 10;
+    cursor: pointer;
+}
+
+/* Modal Desktop Overrides (Center Popup) */
+@media (min-width: 769px) {
+    .modal { align-items: center; } /* Center vertically */
+    
+    .modal-content {
+        height: auto;
+        max-width: 900px;
+        flex-direction: row;
+        border-radius: 4px;
+        border: 1px solid var(--gold);
+    }
+    
+    .modal-img-container { height: 500px; flex: 1; }
+    .modal-img-container img { border-radius: 0; }
+    
+    .modal-info { height: auto; flex: 1; padding: 40px; }
+    .close-btn { background: transparent; font-size: 40px; top: 10px; right: 20px; }
+}
+
+/* =========================================
+   7. ANIMATIONS & FOOTER
+   ========================================= */
+footer {
+    padding: 30px;
+    text-align: center;
+    border-top: 1px solid #222;
+    background: var(--black);
+    color: #555;
+    font-size: 0.8rem;
+}
+
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes fadeSlide {
+    0% { opacity: 0; transform: scale(1.1); }
+    5% { opacity: 1; transform: scale(1); }
+    33% { opacity: 1; transform: scale(1); }
+    38% { opacity: 0; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(1.1); }
+}
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+/* =========================================
+   8. ABOUT PAGE STYLES
+   ========================================= */
+.about-section {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.about-grid {
+    display: flex;
+    flex-direction: column; /* Mobile: Stack vertically */
+    gap: 30px;
+    margin-bottom: 60px;
+    align-items: center;
+}
+
+.about-img {
+    width: 100%;
+}
+
+.about-img img {
+    width: 100%;
+    height: 300px; /* Consistent height */
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #333;
+}
+
+.about-text {
+    width: 100%;
+    text-align: center;
+}
+
+.about-text h3 {
+    color: var(--gold);
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+}
+
+.about-text p {
+    color: #ccc;
+    line-height: 1.8;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+}
+
+/* Founder Quote Block */
+.founder-quote {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: var(--dark-panel);
+    border-left: 3px solid var(--gold);
+    border-right: 3px solid var(--gold);
+    margin: 40px 0;
+}
+
+.quote-text {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    color: var(--white);
+    font-style: italic;
+    margin-bottom: 15px;
+}
+
+.quote-author {
+    display: block;
+    color: var(--gold);
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.about-cta {
+    text-align: center;
+    padding: 40px 0;
+}
+
+/* Desktop Styles for About Page */
+@media (min-width: 769px) {
+    .about-section { padding: 60px; }
+    
+    .about-grid {
+        flex-direction: row; /* Desktop: Side by side */
+        gap: 60px;
+    }
+
+    /* Alternating layout helper (Text Left / Img Right) */
+    .about-grid.reverse-mobile {
+        flex-direction: row; 
+    }
+
+    .about-img, .about-text {
+        flex: 1;
+        text-align: left;
+    }
+    
+    .about-img img { height: 400px; }
+}
