@@ -606,3 +606,134 @@ footer {
     
     .about-img img { height: 400px; }
 }
+/* --- CONTACT PAGE STYLES --- */
+
+/* Header */
+.contact-header {
+    text-align: center;
+    padding: 60px 20px 20px;
+    color: var(--gold);
+}
+.contact-header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+.contact-header p { color: #ccc; }
+
+/* Layout Container */
+.contact-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Card Styling (Shared) */
+.contact-form-card, .contact-info-card {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 30px;
+    flex: 1;
+    min-width: 300px; /* Mobile responsive */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+/* Form Styles */
+.contact-form-card h3 { color: #fff; margin-bottom: 20px; }
+
+.form-group { margin-bottom: 15px; }
+
+.contact-form-card input, 
+.contact-form-card textarea {
+    width: 100%;
+    padding: 12px;
+    background: #000;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 6px;
+    outline: none;
+    font-family: inherit;
+    transition: 0.3s;
+}
+
+.contact-form-card input:focus, 
+.contact-form-card textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 12px;
+    background: var(--gold);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+.btn-submit:hover { background: #b5952f; }
+
+/* Info Card Styles */
+.contact-info-card {
+    /* Background Image Effect similar to reference */
+    background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1611591437281-460bfbe1220a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80');
+    background-size: cover;
+    border: 1px solid var(--gold);
+    color: #fff;
+}
+
+.contact-info-card h3 { color: var(--gold); margin-bottom: 15px; }
+.contact-info-card p { line-height: 1.6; color: #ddd; }
+
+/* Quick Buttons */
+.quick-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-quick {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    border-radius: 6px;
+    text-decoration: none;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.whatsapp { background: #25D366; }
+.whatsapp:hover { background: #1ebc57; }
+
+.email { background: #d44638; }
+.email:hover { background: #c23321; }
+
+.call { background: #007bff; }
+.call:hover { background: #0069d9; }
+
+/* Map Section */
+.map-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px 40px;
+}
+.map-container h3 {
+    color: var(--gold);
+    margin-bottom: 20px;
+    text-align: center;
+}
+.map-container iframe {
+    border-radius: 12px;
+    border: 1px solid #333;
+    filter: invert(90%) hue-rotate(180deg); /* Makes the map dark mode! */
+}
