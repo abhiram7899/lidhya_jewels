@@ -4,66 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | Lidhya</title>
-    <link rel="icon" type="image/jpeg" href="logo.jpeg">
+    <link rel="icon" type="image/jpeg" href="images/logo.jpeg">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
-        /* Admin Styles */
+        /* Admin Specific Styles */
+        body { background-color: #000; color: #fff; font-family: 'Playfair Display', serif; }
+        
         .admin-container {
             max-width: 600px;
             margin: 30px auto;
             padding: 20px;
-            background: var(--dark-panel);
-            border: 1px solid var(--gold);
+            background: #111;
+            border: 1px solid #d4af37; /* Gold Border */
             border-radius: 8px;
         }
+
         .form-group { margin-bottom: 15px; }
-        label { display: block; color: var(--gold); margin-bottom: 5px; font-weight: bold; }
+        label { display: block; color: #d4af37; margin-bottom: 5px; font-weight: bold; }
+        
         input, textarea, select {
             width: 100%; padding: 10px; background: #000;
             border: 1px solid #333; color: #fff; border-radius: 4px; outline: none;
+            box-sizing: border-box; /* Fixes padding issues */
         }
-        .status-msg { text-align: center; margin-top: 10px; font-weight: bold; }
-        .hidden { display: none; }
 
-        /* NEW: Product List Styles */
+        button { cursor: pointer; font-weight: bold; border: none; border-radius: 4px; }
+        
+        .btn-gold { background: #d4af37; color: #000; padding: 10px 20px; font-size: 1rem; width: 100%; }
+        .btn-gold:hover { background: #b5952f; }
+
+        .hidden { display: none !important; }
+
+        /* Inventory List Styles */
         .inventory-list { margin-top: 40px; }
         .inventory-item {
             display: flex; align-items: center; justify-content: space-between;
-            background: #000; padding: 10px; border-bottom: 1px solid #333; gap: 10px;
+            background: #1a1a1a; padding: 10px; border-bottom: 1px solid #333; gap: 10px;
+            margin-bottom: 5px; border-radius: 4px;
         }
-        .inventory-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
-        .item-details { flex-grow: 1; }
-        .item-name { color: #fff; font-size: 0.9rem; display: block; }
-        .item-price { color: var(--gold); font-size: 0.8rem; }
         
-        .btn-toggle {
-            padding: 5px 10px; font-size: 0.7rem; cursor: pointer; border: none; border-radius: 4px;
-        }
-        .btn-sold { background: #d32f2f; color: white; } /* Red for Sold Out */
-        .btn-active { background: #388e3c; color: white; } /* Green for Available */
-        .btn-delete { background: transparent; color: #666; font-size: 1.2rem; cursor: pointer; border:none; margin-left: 5px;}
+        .btn-toggle { padding: 5px 10px; font-size: 0.7rem; color: white; }
+        .btn-sold { background: #d32f2f; } /* Red */
+        .btn-active { background: #388e3c; } /* Green */
+        
+        .btn-delete { background: transparent; color: #888; font-size: 1.5rem; padding: 0 10px; }
+        .btn-delete:hover { color: red; }
     </style>
 </head>
 <body>
 
-    <nav class="scrolled-nav">
-        <div class="logo-container">
-            <img src="logo.jpeg" alt="Lidhya Logo" class="nav-logo">
-        </div>
-        <div style="color:white; font-weight:bold;">ADMIN PANEL</div>
+    <nav style="text-align:center; padding: 20px; border-bottom: 1px solid #333;">
+        <h2 style="color:#d4af37; margin:0;">LIDHYA ADMIN</h2>
     </nav>
 
     <div id="login-section" class="admin-container" style="text-align:center;">
-        <h2 style="color:var(--gold); margin-bottom:20px;">Enter Admin PIN</h2>
-        <input type="password" id="admin-pin" placeholder="PIN" style="text-align:center; font-size:1.2rem;">
-        <button class="btn-gold" onclick="checkPin()" style="margin-top:20px; width:100%;">Login</button>
+        <h3 style="color:#fff; margin-bottom:20px;">Secure Login</h3>
+        
+        <div class="form-group">
+            <input type="email" id="admin-email" placeholder="Email" value="abhiram1234sharma1234@gmail.com">
+        </div>
+        <div class="form-group">
+            <input type="password" id="admin-pass" placeholder="Password">
+        </div>
+        
+        <button class="btn-gold" onclick="checkLogin()">Login</button>
     </div>
 
     <div id="admin-panel" class="admin-container hidden">
         
-        <h2 style="text-align:center; color:var(--white); border-bottom:1px solid #333; padding-bottom:10px;">Add New Product</h2>
-        <div class="form-group" style="margin-top:20px;">
+        <h3 style="text-align:center; color:#d4af37; border-bottom:1px solid #333; padding-bottom:10px;">Add New Product</h3>
+        
+        <div class="form-group">
             <label>Name</label><input type="text" id="p-name">
         </div>
         <div class="form-group">
@@ -84,11 +97,11 @@
         <div class="form-group">
             <label>Image</label><input type="file" id="p-image" accept="image/*">
         </div>
-        <button class="btn-gold" id="upload-btn" onclick="uploadAndAdd()" style="width:100%;">Upload Product</button>
-        <p id="status" class="status-msg"></p>
+        
+        <button class="btn-gold" id="upload-btn" onclick="uploadAndAdd()">Upload Product</button>
 
         <div class="inventory-list">
-            <h2 style="text-align:center; color:var(--white); border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:15px;">Manage Stock</h2>
+            <h3 style="text-align:center; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">Manage Stock</h3>
             <div id="product-list">
                 <p style="text-align:center; color:#666;">Loading products...</p>
             </div>
@@ -96,167 +109,166 @@
 
     </div>
 
-   
-      <script>
-    // 1. CONFIGURATION
-    const SUPABASE_URL = 'https://unuswepvspaxyepakkkn.supabase.co';
-    
-    // ⚠️ PASTE YOUR KEY HERE
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVudXN3ZXB2c3BheHllcGFra2tuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2NjUyNjAsImV4cCI6MjA4NDI0MTI2MH0.D-sL54xnijvTu6CvDu29n20zbW1rZJNdAo6MXlsMm4w'; 
-
-    const { createClient } = supabase;
-    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // --- SECURE LOGIN LOGIC ---
-    async function checkPin() {
-        // ⚠️ REPLACE THIS WITH YOUR REGISTERED ADMIN EMAIL
-        const email = "abhiram1234sharma1234@gmail.com"; 
+    <script>
+        // 1. CONFIGURATION
+        const SUPABASE_URL = 'https://unuswepvspaxyepakkkn.supabase.co';
         
-        const password = document.getElementById('admin-pin').value;
-        const btn = document.querySelector('#login-section button');
-        
-        btn.innerText = "Verifying...";
-        
-        // Secure Login via Supabase
-        const { data, error } = await db.auth.signInWithPassword({
-            email: email,
-            password: password
-        });
+        // YOUR API KEY
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVudXN3ZXB2c3BheHllcGFra2tuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2NjUyNjAsImV4cCI6MjA4NDI0MTI2MH0.D-sL54xnijvTu6CvDu29n20zbW1rZJNdAo6MXlsMm4w';
 
-        if (error) {
-            alert("❌ Login Failed: " + error.message);
-            btn.innerText = "Login";
-        } else {
-            // Success
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('admin-panel').classList.remove('hidden');
-            fetchProductsForAdmin();
-        }
-    }
+        const { createClient } = supabase;
+        const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- FETCH PRODUCTS (With Sold Out & Delete) ---
-    async function fetchProductsForAdmin() {
-        const listContainer = document.getElementById('product-list');
-        
-        // Fetch products (Newest first)
-        let { data: products, error } = await db
-            .from('products')
-            .select('*')
-            .order('id', { ascending: false });
+        // --- SECURE LOGIN LOGIC ---
+        async function checkLogin() {
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-pass').value;
+            const btn = document.querySelector('#login-section button');
+            
+            if(!email || !password) return alert("Please enter both email and password");
 
-        if(error) {
-            console.error(error);
-            listContainer.innerHTML = '<p style="color:red; text-align:center">Error loading list</p>';
-            return;
+            btn.innerText = "Verifying...";
+            
+            // Secure Login via Supabase
+            const { data, error } = await db.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (error) {
+                alert("❌ Login Failed: " + error.message);
+                btn.innerText = "Login";
+            } else {
+                // Success
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                fetchProductsForAdmin();
+            }
         }
 
-        if(products.length === 0) {
-            listContainer.innerHTML = '<p style="color:#666; text-align:center">No products found.</p>';
-            return;
-        }
+        // --- FETCH PRODUCTS LIST ---
+        async function fetchProductsForAdmin() {
+            const listContainer = document.getElementById('product-list');
+            
+            // Fetch products (Newest first)
+            let { data: products, error } = await db
+                .from('products')
+                .select('*')
+                .order('id', { ascending: false });
 
-        // Render HTML
-        listContainer.innerHTML = products.map(p => {
-            const isSold = p.sold_out === true;
-            const btnText = isSold ? "Mark Available" : "Mark Sold Out";
-            const btnClass = isSold ? "btn-active" : "btn-sold"; 
-            const statusColor = isSold ? "color:red;" : "color:green;";
-            const statusText = isSold ? "(SOLD OUT)" : "(In Stock)";
+            if(error) {
+                console.error(error);
+                listContainer.innerHTML = '<p style="color:red; text-align:center">Error loading list</p>';
+                return;
+            }
 
-            return `
-            <div class="inventory-item">
-                <img src="${p.image}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
-                <div class="item-details">
-                    <span class="item-name" style="color:white; display:block;">${p.name}</span>
-                    <span style="${statusColor} font-size:0.8rem">${statusText}</span>
+            if(products.length === 0) {
+                listContainer.innerHTML = '<p style="color:#666; text-align:center">No products found.</p>';
+                return;
+            }
+
+            // Render HTML
+            listContainer.innerHTML = products.map(p => {
+                const isSold = p.sold_out === true;
+                const btnText = isSold ? "Mark Available" : "Mark Sold Out";
+                const btnClass = isSold ? "btn-active" : "btn-sold"; 
+                const statusColor = isSold ? "color:red;" : "color:green;";
+                const statusText = isSold ? "(SOLD OUT)" : "";
+
+                return `
+                <div class="inventory-item">
+                    <img src="${p.image}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
+                    <div style="flex:1; margin-left:10px;">
+                        <span style="color:white; display:block; font-size:0.9rem;">${p.name}</span>
+                        <span style="${statusColor} font-size:0.7rem; font-weight:bold;">${statusText}</span>
+                    </div>
+                    
+                    <button class="btn-toggle ${btnClass}" onclick="toggleSoldOut(${p.id}, ${isSold})" style="margin-right:10px;">
+                        ${btnText}
+                    </button>
+                    
+                    <button class="btn-delete" onclick="deleteProduct(${p.id})">&times;</button>
                 </div>
-                
-                <button class="btn-toggle ${btnClass}" onclick="toggleSoldOut(${p.id}, ${isSold})" style="margin-right:10px; cursor:pointer; padding:5px;">
-                    ${btnText}
-                </button>
-                
-                <button class="btn-delete" onclick="deleteProduct(${p.id})">&times;</button>
-            </div>
-            `;
-        }).join('');
-    }
-
-    // --- TOGGLE SOLD OUT LOGIC ---
-    async function toggleSoldOut(id, currentStatus) {
-        const { error } = await db
-            .from('products')
-            .update({ sold_out: !currentStatus })
-            .eq('id', id);
-
-        if(error) {
-            alert("Error: " + error.message);
-        } else {
-            fetchProductsForAdmin(); // Refresh list
+                `;
+            }).join('');
         }
-    }
 
-    // --- DELETE LOGIC ---
-    async function deleteProduct(id) {
-        if(!confirm("Are you sure you want to delete this product?")) return;
+        // --- TOGGLE SOLD OUT ---
+        async function toggleSoldOut(id, currentStatus) {
+            const { error } = await db
+                .from('products')
+                .update({ sold_out: !currentStatus })
+                .eq('id', id);
 
-        const { error } = await db
-            .from('products')
-            .delete()
-            .eq('id', id);
-
-        if(error) alert("Error deleting: " + error.message);
-        else fetchProductsForAdmin();
-    }
-
-    // --- UPLOAD LOGIC ---
-    async function uploadAndAdd() {
-        const btn = document.getElementById('upload-btn');
-        const file = document.getElementById('p-image').files[0];
-
-        if (!file || !document.getElementById('p-name').value) return alert("Please fill in all details!");
-
-        btn.innerText = "Uploading...";
-        btn.disabled = true;
-
-        try {
-            // 1. Upload Image
-            const fileName = Date.now() + "_" + file.name.replace(/\s/g, '_');
-            const { error: uploadError } = await db.storage.from('product-images').upload(fileName, file);
-            if (uploadError) throw uploadError;
-
-            const { data: { publicUrl } } = db.storage.from('product-images').getPublicUrl(fileName);
-
-            // 2. Insert Data
-            const { error: insertError } = await db.from('products').insert([{
-                name: document.getElementById('p-name').value,
-                category: document.getElementById('p-category').value,
-                price: document.getElementById('p-price').value,
-                description: document.getElementById('p-desc').value,
-                image: publicUrl,
-                sold_out: false
-            }]);
-
-            if (insertError) throw insertError;
-
-            alert("✅ Product Added Successfully!");
-            
-            // Clear Form
-            document.getElementById('p-name').value = "";
-            document.getElementById('p-price').value = "";
-            document.getElementById('p-desc').value = "";
-            document.getElementById('p-image').value = ""; 
-            
-            fetchProductsForAdmin();
-
-        } catch (err) {
-            console.error(err);
-            alert("Error: " + err.message);
-        } finally {
-            btn.innerText = "Upload Product";
-            btn.disabled = false;
+            if(error) {
+                alert("Error: " + error.message);
+            } else {
+                fetchProductsForAdmin(); // Refresh list
+            }
         }
-    }
-</script>
-    
+
+        // --- DELETE PRODUCT ---
+        async function deleteProduct(id) {
+            if(!confirm("Are you sure you want to delete this product?")) return;
+
+            const { error } = await db
+                .from('products')
+                .delete()
+                .eq('id', id);
+
+            if(error) alert("Error deleting: " + error.message);
+            else fetchProductsForAdmin();
+        }
+
+        // --- UPLOAD NEW PRODUCT ---
+        async function uploadAndAdd() {
+            const btn = document.getElementById('upload-btn');
+            const file = document.getElementById('p-image').files[0];
+
+            if (!file || !document.getElementById('p-name').value) return alert("Please fill in all details!");
+
+            btn.innerText = "Uploading...";
+            btn.disabled = true;
+
+            try {
+                // 1. Upload Image
+                const fileName = Date.now() + "_" + file.name.replace(/\s/g, '_');
+                const { error: uploadError } = await db.storage.from('product-images').upload(fileName, file);
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = db.storage.from('product-images').getPublicUrl(fileName);
+
+                // 2. Insert Data
+                const { error: insertError } = await db.from('products').insert([{
+                    name: document.getElementById('p-name').value,
+                    category: document.getElementById('p-category').value,
+                    price: document.getElementById('p-price').value,
+                    description: document.getElementById('p-desc').value,
+                    image: publicUrl,
+                    sold_out: false
+                }]);
+
+                if (insertError) throw insertError;
+
+                alert("✅ Product Added Successfully!");
+                
+                // Clear Form
+                document.getElementById('p-name').value = "";
+                document.getElementById('p-price').value = "";
+                document.getElementById('p-desc').value = "";
+                document.getElementById('p-image').value = ""; 
+                
+                fetchProductsForAdmin();
+
+            } catch (err) {
+                console.error(err);
+                alert("Error: " + err.message);
+            } finally {
+                btn.innerText = "Upload Product";
+                btn.disabled = false;
+            }
+        }
+    </script>
+
 </body>
 </html>
