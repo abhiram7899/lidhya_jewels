@@ -92,21 +92,41 @@
 
 </div>
 
-    <footer>
-        <p>&copy; 2026 Lidhya Jewels. All rights reserved.</p>
+   <footer>
+        <p>© 2026 Lidhya Jewels. All rights reserved.</p>
     </footer>
 
     <script src="script.js"></script>
+    
     <script>
-        // Simple function to handle the form (Just simulates sending)
         function sendMessage(event) {
-            event.preventDefault();
+            event.preventDefault(); // Stop page refresh
+
+            // 1. Get Values from the form
             const name = document.getElementById('c-name').value;
+            const phone = document.getElementById('c-phone').value;
+            const email = document.getElementById('c-email').value; // Optional
             const msg = document.getElementById('c-message').value;
-            
-            // Open WhatsApp with the message
-            const text = `Hello Lidhya, my name is ${name}. ${msg}`;
-            window.location.href = `https://wa.me/917204061517?text=${encodeURIComponent(text)}`;
+
+            // 2. Create a clean message format
+            const fullMessage = `Hello Lidhya! 👋\n\nI have an inquiry:\n👤 Name: ${name}\n📞 Phone: ${phone}\n📧 Email: ${email}\n\n📝 Message:\n${msg}`;
+
+            // 3. Copy to Clipboard & Open Instagram
+            navigator.clipboard.writeText(fullMessage).then(() => {
+                
+                // 4. Notify User
+                const proceed = confirm("✅ Message copied to clipboard!\n\nClick OK to open Instagram, then PASTE the message.");
+                
+                if (proceed) {
+                    // Open your Instagram DM
+                    window.location.href = "https://ig.me/m/lidhya_jewels"; 
+                }
+
+            }).catch(err => {
+                console.error("Clipboard failed", err);
+                // Fallback: Just open Instagram if copy fails
+                window.location.href = "https://ig.me/m/lidhya_jewels";
+            });
         }
     </script>
 </body>
