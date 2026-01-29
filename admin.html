@@ -27,7 +27,7 @@
         input, textarea, select {
             width: 100%; padding: 10px; background: #000;
             border: 1px solid #333; color: #fff; border-radius: 4px; outline: none;
-            box-sizing: border-box; /* Fixes padding issues */
+            box-sizing: border-box; 
         }
 
         button { cursor: pointer; font-weight: bold; border: none; border-radius: 4px; }
@@ -60,13 +60,10 @@
     </nav>
 
     <div id="login-section" class="admin-container" style="text-align:center;">
-        <h3 style="color:#fff; margin-bottom:20px;">Secure Login</h3>
+        <h3 style="color:#fff; margin-bottom:20px;">Admin Access</h3>
         
         <div class="form-group">
-            <input type="email" id="admin-email" placeholder="Email" value="abhiram1234sharma1234@gmail.com">
-        </div>
-        <div class="form-group">
-            <input type="password" id="admin-pass" placeholder="Password">
+            <input type="password" id="admin-pass" placeholder="Enter Password" style="text-align:center; font-size:1.2rem;">
         </div>
         
         <button class="btn-gold" onclick="checkLogin()">Login</button>
@@ -119,13 +116,15 @@
         const { createClient } = supabase;
         const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // --- SECURE LOGIN LOGIC ---
+        // --- SECURE LOGIN LOGIC (Hidden Email) ---
         async function checkLogin() {
-            const email = document.getElementById('admin-email').value;
+            // ⚠️ THE EMAIL IS HIDDEN HERE IN THE CODE
+            const email = "abhiram1234sharma1234@gmail.com"; 
+            
             const password = document.getElementById('admin-pass').value;
             const btn = document.querySelector('#login-section button');
             
-            if(!email || !password) return alert("Please enter both email and password");
+            if(!password) return alert("Please enter password");
 
             btn.innerText = "Verifying...";
             
@@ -150,7 +149,6 @@
         async function fetchProductsForAdmin() {
             const listContainer = document.getElementById('product-list');
             
-            // Fetch products (Newest first)
             let { data: products, error } = await db
                 .from('products')
                 .select('*')
@@ -167,7 +165,6 @@
                 return;
             }
 
-            // Render HTML
             listContainer.innerHTML = products.map(p => {
                 const isSold = p.sold_out === true;
                 const btnText = isSold ? "Mark Available" : "Mark Sold Out";
@@ -195,27 +192,15 @@
 
         // --- TOGGLE SOLD OUT ---
         async function toggleSoldOut(id, currentStatus) {
-            const { error } = await db
-                .from('products')
-                .update({ sold_out: !currentStatus })
-                .eq('id', id);
-
-            if(error) {
-                alert("Error: " + error.message);
-            } else {
-                fetchProductsForAdmin(); // Refresh list
-            }
+            const { error } = await db.from('products').update({ sold_out: !currentStatus }).eq('id', id);
+            if(error) alert("Error: " + error.message);
+            else fetchProductsForAdmin();
         }
 
         // --- DELETE PRODUCT ---
         async function deleteProduct(id) {
             if(!confirm("Are you sure you want to delete this product?")) return;
-
-            const { error } = await db
-                .from('products')
-                .delete()
-                .eq('id', id);
-
+            const { error } = await db.from('products').delete().eq('id', id);
             if(error) alert("Error deleting: " + error.message);
             else fetchProductsForAdmin();
         }
@@ -231,14 +216,12 @@
             btn.disabled = true;
 
             try {
-                // 1. Upload Image
                 const fileName = Date.now() + "_" + file.name.replace(/\s/g, '_');
                 const { error: uploadError } = await db.storage.from('product-images').upload(fileName, file);
                 if (uploadError) throw uploadError;
 
                 const { data: { publicUrl } } = db.storage.from('product-images').getPublicUrl(fileName);
 
-                // 2. Insert Data
                 const { error: insertError } = await db.from('products').insert([{
                     name: document.getElementById('p-name').value,
                     category: document.getElementById('p-category').value,
@@ -249,7 +232,6 @@
                 }]);
 
                 if (insertError) throw insertError;
-
                 alert("✅ Product Added Successfully!");
                 
                 // Clear Form
@@ -257,9 +239,7 @@
                 document.getElementById('p-price').value = "";
                 document.getElementById('p-desc').value = "";
                 document.getElementById('p-image').value = ""; 
-                
                 fetchProductsForAdmin();
-
             } catch (err) {
                 console.error(err);
                 alert("Error: " + err.message);
