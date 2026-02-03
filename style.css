@@ -711,15 +711,9 @@ footer {
     justify-content: center;
     gap: 5px;
 }
+.email { background: #b5952f; }
+.email:hover { background: #b5952f; }
 
-.whatsapp { background: #25D366; }
-.whatsapp:hover { background: #1ebc57; }
-
-.email { background: #d44638; }
-.email:hover { background: #c23321; }
-
-.call { background: #007bff; }
-.call:hover { background: #0069d9; }
 
 /* Map Section */
 .map-container {
